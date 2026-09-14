@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fernweh — Admin</title>
+<title id="pageTitle">Fernweh — Admin</title>
 <style>
 /* ============================================================
    FERNWEH SUPPLY CO. — shared styles
@@ -928,7 +928,7 @@ table.orders-table {
 <!-- Admin dashboard (shown after login) -->
 <div id="dashboard" style="display:none;">
   <header class="admin-header">
-    <a href="admin.html" class="wordmark">Fernweh<span>.</span> Admin</a>
+    <a href="admin.html" class="wordmark"><span id="storeNameText">Fernweh</span><span>.</span> Admin</a>
     <button class="logout-link" id="logoutBtn">Log out</button>
   </header>
 
@@ -937,6 +937,7 @@ table.orders-table {
       <button class="tab-btn active" data-tab="orders">Orders</button>
       <button class="tab-btn" data-tab="products">Products</button>
       <button class="tab-btn" data-tab="checkout">Checkout fields</button>
+      <button class="tab-btn" data-tab="store">Store</button>
       <button class="tab-btn" data-tab="summary">Summary</button>
     </div>
 
@@ -982,6 +983,40 @@ table.orders-table {
       <div class="save-bar">
         <button class="download-btn" id="saveCheckoutConfigBtn">Save changes</button>
         <span class="save-status" id="checkoutSaveStatus"></span>
+      </div>
+    </div>
+
+    <!-- Store tab -->
+    <div class="tab-panel" id="tab-store">
+      <div class="field-editor-section">
+        <h3>Store name</h3>
+        <p class="hint">Shown in the browser tab and in the header on the storefront and this dashboard.</p>
+        <div class="form-row">
+          <label for="stName">Store name</label>
+          <input id="stName" placeholder="e.g. Northline Goods">
+        </div>
+      </div>
+
+      <div class="field-editor-section">
+        <h3>Homepage text</h3>
+        <p class="hint">The intro copy shoppers see at the top of the storefront.</p>
+        <div class="form-row">
+          <label for="stEyebrow">Small label above the heading</label>
+          <input id="stEyebrow" placeholder="e.g. Fall / Winter collection">
+        </div>
+        <div class="form-row">
+          <label for="stHeading">Headline</label>
+          <input id="stHeading" placeholder="e.g. Built for weather that doesn't check the forecast.">
+        </div>
+        <div class="form-row">
+          <label for="stSubtext">Subtext</label>
+          <textarea id="stSubtext" rows="2" placeholder="e.g. Small-batch outerwear and everyday layers..."></textarea>
+        </div>
+      </div>
+
+      <div class="save-bar">
+        <button class="download-btn" id="saveStoreSettingsBtn">Save changes</button>
+        <span class="save-status" id="storeSaveStatus"></span>
       </div>
     </div>
 
@@ -1154,6 +1189,7 @@ if (!firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("PASTE_")) {
       loadOrders();
       loadProducts();
       loadCheckoutConfig();
+      loadStoreSettings();
     } else {
       loginShell.style.display = "block";
       dashboard.style.display = "none";
@@ -1397,6 +1433,9 @@ productOverlay.addEventListener("click", (e) => { if (e.target === productOverla
 
 pfImageUrl.addEventListener("input", () => { pfImagePreview.src = pfImageUrl.value; });
 
+let uploadInProgress = false;
+const productModalSave = document.getElementById("productModalSave");
+
 pfImageFile.addEventListener("change", () => {
   const file = pfImageFile.files[0];
   if (!file) return;
@@ -1404,6 +1443,9 @@ pfImageFile.addEventListener("change", () => {
     pfUploadStatus.textContent = "Image upload isn't set up — paste an image URL instead, or see README for enabling Firebase Storage.";
     return;
   }
+  uploadInProgress = true;
+  productModalSave.disabled = true;
+  productModalSave.textContent = "Uploading photo...";
   pfUploadStatus.textContent = "Uploading...";
   const path = "product-images/" + Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9._-]/g, "");
   const ref = storage.ref().child(path);
@@ -1413,10 +1455,18 @@ pfImageFile.addEventListener("change", () => {
     pfUploadStatus.textContent = "Uploaded.";
   }).catch(err => {
     pfUploadStatus.textContent = "Upload failed: " + err.message;
+  }).finally(() => {
+    uploadInProgress = false;
+    productModalSave.disabled = false;
+    productModalSave.textContent = "Save product";
   });
 });
 
-document.getElementById("productModalSave").addEventListener("click", () => {
+productModalSave.addEventListener("click", () => {
+  if (uploadInProgress) {
+    alert("Hang on — the photo is still uploading. Try Save again in a moment.");
+    return;
+  }
   const name = pfName.value.trim();
   const price = parseFloat(pfPrice.value);
   if (!name) { alert("Give the product a name."); return; }
@@ -1583,6 +1633,53 @@ document.getElementById("saveCheckoutConfigBtn").addEventListener("click", () =>
     standardFields: checkoutConfig.standardFields,
     customFields: cleanedCustomFields
   }).then(() => {
+    statusEl.textContent = "Saved.";
+    setTimeout(() => { statusEl.textContent = ""; }, 3000);
+  }).catch(err => {
+    statusEl.textContent = "Couldn't save: " + err.message;
+  });
+});
+
+// ========================================================
+// STORE TAB
+// ========================================================
+const DEFAULT_STORE_SETTINGS = {
+  storeName: "Fernweh",
+  eyebrow: "Fall / Winter collection",
+  heroHeading: "Built for weather that doesn't check the forecast.",
+  heroSubtext: "Small-batch outerwear and everyday layers, made to be worn hard and repaired, not replaced."
+};
+
+function loadStoreSettings() {
+  db.collection("settings").doc("store").get().then(docSnap => {
+    const s = Object.assign({}, DEFAULT_STORE_SETTINGS, docSnap.exists ? docSnap.data() : {});
+    document.getElementById("stName").value = s.storeName;
+    document.getElementById("stEyebrow").value = s.eyebrow;
+    document.getElementById("stHeading").value = s.heroHeading;
+    document.getElementById("stSubtext").value = s.heroSubtext;
+    applyStoreBranding(s);
+  }).catch(err => {
+    console.warn("Couldn't load store settings, using defaults:", err);
+    applyStoreBranding(DEFAULT_STORE_SETTINGS);
+  });
+}
+
+function applyStoreBranding(s) {
+  document.getElementById("pageTitle").textContent = s.storeName + " — Admin";
+  document.getElementById("storeNameText").textContent = s.storeName;
+}
+
+document.getElementById("saveStoreSettingsBtn").addEventListener("click", () => {
+  const statusEl = document.getElementById("storeSaveStatus");
+  const s = {
+    storeName: document.getElementById("stName").value.trim() || "My Store",
+    eyebrow: document.getElementById("stEyebrow").value.trim(),
+    heroHeading: document.getElementById("stHeading").value.trim(),
+    heroSubtext: document.getElementById("stSubtext").value.trim()
+  };
+
+  db.collection("settings").doc("store").set(s).then(() => {
+    applyStoreBranding(s);
     statusEl.textContent = "Saved.";
     setTimeout(() => { statusEl.textContent = ""; }, 3000);
   }).catch(err => {

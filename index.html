@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fernweh Supply Co.</title>
+<title id="pageTitle">Fernweh Supply Co.</title>
 <style>
 /* ============================================================
    FERNWEH SUPPLY CO. — shared styles
@@ -744,16 +744,16 @@ table.orders-table {
 <body>
 
 <header class="site-header">
-  <a href="index.html" class="wordmark">Fernweh<span>.</span></a>
+  <a href="index.html" class="wordmark"><span id="storeNameText">Fernweh</span><span>.</span></a>
   <button class="cart-toggle" id="cartToggle">
     Cart <span class="cart-count" id="cartCount">0</span>
   </button>
 </header>
 
 <section class="hero">
-  <div class="eyebrow">Fall / Winter collection</div>
-  <h1>Built for weather that doesn't check the forecast.</h1>
-  <p>Small-batch outerwear and everyday layers, made to be worn hard and repaired, not replaced.</p>
+  <div class="eyebrow" id="heroEyebrow">Fall / Winter collection</div>
+  <h1 id="heroHeading">Built for weather that doesn't check the forecast.</h1>
+  <p id="heroSubtext">Small-batch outerwear and everyday layers, made to be worn hard and repaired, not replaced.</p>
 </section>
 
 <main class="catalog">
@@ -920,6 +920,28 @@ try {
   }
 } catch (e) {
   console.warn("Firebase not initialized yet:", e);
+}
+
+// ---------- Store branding (name, hero text) ----------
+const DEFAULT_STORE_SETTINGS = {
+  storeName: "Fernweh",
+  eyebrow: "Fall / Winter collection",
+  heroHeading: "Built for weather that doesn't check the forecast.",
+  heroSubtext: "Small-batch outerwear and everyday layers, made to be worn hard and repaired, not replaced."
+};
+
+function loadStoreSettings() {
+  if (!firebaseReady) return;
+  db.collection("settings").doc("store").get().then(docSnap => {
+    const s = Object.assign({}, DEFAULT_STORE_SETTINGS, docSnap.exists ? docSnap.data() : {});
+    document.getElementById("pageTitle").textContent = s.storeName;
+    document.getElementById("storeNameText").textContent = s.storeName;
+    document.getElementById("heroEyebrow").textContent = s.eyebrow;
+    document.getElementById("heroHeading").textContent = s.heroHeading;
+    document.getElementById("heroSubtext").textContent = s.heroSubtext;
+  }).catch(err => {
+    console.warn("Couldn't load store settings, using defaults:", err);
+  });
 }
 
 // ---------- Live product catalog ----------
@@ -1296,13 +1318,14 @@ checkoutForm.addEventListener("submit", async (e) => {
 });
 
 // ---------- Init ----------
+loadStoreSettings();
 loadProducts();
 loadCheckoutConfig();
 renderCartCount();
 renderDrawer();
 
 if (!firebaseReady) {
-  console.warn("Fernweh: Firebase isn't configured yet — orders will not be saved until you complete the FIREBASE CONFIG setup steps in this file.");
+  console.warn("Store: Firebase isn't configured yet — orders will not be saved until you complete the FIREBASE CONFIG setup steps in this file.");
 }
 
 </script>
