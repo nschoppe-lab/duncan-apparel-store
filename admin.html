@@ -1078,6 +1078,28 @@ table.orders-table {
   </div>
 </div>
 
+<!-- Order edit modal -->
+<div class="overlay" id="orderOverlay">
+  <div class="modal">
+    <button class="modal-close" id="orderModalClose">&times;</button>
+    <h3 style="margin-bottom:20px;">Edit order</h3>
+    <div id="orderEditFields"></div>
+    <div class="form-row">
+      <label>Items</label>
+      <div id="orderEditItems"></div>
+      <div style="text-align:right; margin-top:10px; font-size:15px;"><strong>New total: <span id="orderEditTotal"></span></strong></div>
+    </div>
+    <div class="form-row">
+      <label for="oeStatus">Status</label>
+      <select id="oeStatus"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary-btn" type="button" id="orderModalCancel">Cancel</button>
+      <button class="primary-btn" type="button" id="orderModalSave">Save order</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1133,6 +1155,14 @@ const firebaseConfig = {
 
 let auth, db, storage;
 let ordersCache = [];
+const ORDER_STATUSES = ["New", "Processing", "Shipped", "Completed", "Cancelled"];
+
+function esc(str) {
+  return String(str == null ? "" : str).replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+}
+function escAttr(str) {
+  return esc(str).replace(/"/g, "&quot;");
+}
 
 // Used only by the "Add 6 starter products" button, so a brand-new store
 // isn't empty on day one. Edit or delete these freely once they're in.
@@ -1265,10 +1295,14 @@ function renderOrdersTable() {
         <td>${itemsSummary}</td>
         <td>${o.itemCount || 0}</td>
         <td>${money(o.total)}</td>
-        <td><span class="status-pill">${o.status || "New"}</span></td>
+        <td><select class="status-select" data-id="${o.id}">${ORDER_STATUSES.map(s => `<option value="${s}" ${((o.status || "New") === s) ? "selected" : ""}>${s}</option>`).join("")}</select></td>
+        <td>
+          <button class="icon-btn" data-edit-order="${o.id}">Edit</button>
+          <button class="icon-btn danger" data-delete-order="${o.id}">Delete</button>
+        </td>
       </tr>
       <tr class="items-detail-row" id="detail-${o.id}">
-        <td colspan="6">
+        <td colspan="7">
           ${o.address ? `<strong>Shipping address</strong><div>${o.address.replace(/\n/g, "<br>")}</div>` : ""}
           ${o.phone ? `<div style="margin-top:6px;"><strong>Phone</strong> ${o.phone}</div>` : ""}
           ${o.note ? `<div style="margin-top:6px;"><strong>Notes</strong> ${o.note}</div>` : ""}
@@ -1289,6 +1323,7 @@ function renderOrdersTable() {
           <th># items</th>
           <th>Total</th>
           <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -1296,11 +1331,149 @@ function renderOrdersTable() {
   `;
 
   wrap.querySelectorAll(".order-row").forEach(row => {
-    row.addEventListener("click", () => {
+    row.addEventListener("click", (e) => {
+      if (e.target.closest("select, button")) return;
       document.getElementById("detail-" + row.dataset.id).classList.toggle("open");
     });
   });
+
+  wrap.querySelectorAll(".status-select").forEach(sel => {
+    sel.addEventListener("click", (e) => e.stopPropagation());
+    sel.addEventListener("change", () => {
+      db.collection("orders").doc(sel.dataset.id).update({ status: sel.value })
+        .catch(err => alert("Couldn't update status: " + err.message));
+    });
+  });
+
+  wrap.querySelectorAll("[data-edit-order]").forEach(btn => {
+    btn.addEventListener("click", (e) => { e.stopPropagation(); openOrderModal(btn.dataset.editOrder); });
+  });
+
+  wrap.querySelectorAll("[data-delete-order]").forEach(btn => {
+    btn.addEventListener("click", (e) => { e.stopPropagation(); deleteOrder(btn.dataset.deleteOrder); });
+  });
 }
+
+// ---------- Order edit / delete ----------
+let editingOrderId = null;
+let editingOrderItems = [];
+
+function deleteOrder(id) {
+  const o = ordersCache.find(x => x.id === id);
+  const customName = o ? `${o.firstName || ""} ${o.lastName || ""}`.trim() : "";
+  const label = customName || (o && o.email) || "this order";
+  if (!confirm(`Delete the order from ${label}? This can't be undone.`)) return;
+  db.collection("orders").doc(id).delete().catch(err => alert("Couldn't delete: " + err.message));
+}
+
+function openOrderModal(id) {
+  const o = ordersCache.find(x => x.id === id);
+  if (!o) return;
+  editingOrderId = id;
+  editingOrderItems = JSON.parse(JSON.stringify(o.items || []));
+
+  let html = "";
+  if (o.firstName !== undefined || o.lastName !== undefined) {
+    html += `<div class="form-grid-2">
+      <div class="form-row"><label for="oeFirstName">First name</label><input id="oeFirstName" value="${escAttr(o.firstName || "")}"></div>
+      <div class="form-row"><label for="oeLastName">Last name</label><input id="oeLastName" value="${escAttr(o.lastName || "")}"></div>
+    </div>`;
+  }
+  if (o.email !== undefined) html += `<div class="form-row"><label for="oeEmail">Email</label><input id="oeEmail" type="email" value="${escAttr(o.email || "")}"></div>`;
+  if (o.phone !== undefined) html += `<div class="form-row"><label for="oePhone">Phone</label><input id="oePhone" value="${escAttr(o.phone || "")}"></div>`;
+  if (o.address !== undefined) html += `<div class="form-row"><label for="oeAddress">Shipping address</label><textarea id="oeAddress" rows="3">${esc(o.address || "")}</textarea></div>`;
+  if (o.note !== undefined) html += `<div class="form-row"><label for="oeNote">Notes</label><textarea id="oeNote" rows="2">${esc(o.note || "")}</textarea></div>`;
+
+  (o.customFields || []).forEach((cf, i) => {
+    html += `<div class="form-row"><label>${esc(cf.label)}</label><input data-oe-custom="${i}" value="${escAttr(cf.value || "")}"></div>`;
+  });
+
+  document.getElementById("orderEditFields").innerHTML = html;
+  renderOrderEditItems();
+
+  const statusSel = document.getElementById("oeStatus");
+  statusSel.innerHTML = ORDER_STATUSES.map(s => `<option value="${s}" ${((o.status || "New") === s) ? "selected" : ""}>${s}</option>`).join("");
+
+  document.getElementById("orderOverlay").classList.add("open");
+}
+
+function closeOrderModal() {
+  document.getElementById("orderOverlay").classList.remove("open");
+}
+
+function renderOrderEditItems() {
+  const wrap = document.getElementById("orderEditItems");
+  if (editingOrderItems.length === 0) {
+    wrap.innerHTML = `<div class="hint">No items left on this order.</div>`;
+  } else {
+    wrap.innerHTML = editingOrderItems.map((it, idx) => `
+      <div class="item-line">
+        <span>${esc(it.name)} &middot; size ${esc(it.size)} &middot; ${money(it.price)} each</span>
+        <span style="display:flex; align-items:center; gap:8px;">
+          <input type="number" min="0" value="${it.qty}" data-item-qty="${idx}" style="width:56px; padding:6px; border:1px solid var(--line); border-radius:var(--radius); font-family:inherit;">
+          <button class="icon-btn danger" type="button" data-item-remove="${idx}">Remove</button>
+        </span>
+      </div>
+    `).join("");
+  }
+
+  wrap.querySelectorAll("[data-item-qty]").forEach(inp => {
+    inp.addEventListener("input", () => {
+      const idx = Number(inp.dataset.itemQty);
+      editingOrderItems[idx].qty = Math.max(0, parseInt(inp.value) || 0);
+      updateOrderEditTotal();
+    });
+  });
+  wrap.querySelectorAll("[data-item-remove]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      editingOrderItems.splice(Number(btn.dataset.itemRemove), 1);
+      renderOrderEditItems();
+    });
+  });
+
+  updateOrderEditTotal();
+}
+
+function updateOrderEditTotal() {
+  const total = editingOrderItems.reduce((s, i) => s + (i.price * i.qty), 0);
+  document.getElementById("orderEditTotal").textContent = money(total);
+}
+
+document.getElementById("orderModalClose").addEventListener("click", closeOrderModal);
+document.getElementById("orderModalCancel").addEventListener("click", closeOrderModal);
+document.getElementById("orderOverlay").addEventListener("click", (e) => {
+  if (e.target.id === "orderOverlay") closeOrderModal();
+});
+
+document.getElementById("orderModalSave").addEventListener("click", () => {
+  const o = ordersCache.find(x => x.id === editingOrderId);
+  if (!o) return;
+
+  const data = {};
+  if (o.firstName !== undefined) data.firstName = document.getElementById("oeFirstName").value.trim();
+  if (o.lastName !== undefined) data.lastName = document.getElementById("oeLastName").value.trim();
+  if (o.email !== undefined) data.email = document.getElementById("oeEmail").value.trim();
+  if (o.phone !== undefined) data.phone = document.getElementById("oePhone").value.trim();
+  if (o.address !== undefined) data.address = document.getElementById("oeAddress").value.trim();
+  if (o.note !== undefined) data.note = document.getElementById("oeNote").value.trim();
+
+  if (o.customFields) {
+    data.customFields = o.customFields.map((cf, i) => {
+      const el = document.querySelector(`[data-oe-custom="${i}"]`);
+      return { label: cf.label, value: el ? el.value.trim() : cf.value };
+    });
+  }
+
+  const finalItems = editingOrderItems.filter(i => i.qty > 0);
+  data.items = finalItems;
+  data.itemCount = finalItems.reduce((s, i) => s + i.qty, 0);
+  data.total = finalItems.reduce((s, i) => s + (i.price * i.qty), 0);
+  data.status = document.getElementById("oeStatus").value;
+
+  db.collection("orders").doc(editingOrderId).update(data)
+    .then(closeOrderModal)
+    .catch(err => alert("Couldn't save: " + err.message));
+});
 
 function renderSummary() {
   const totalOrders = ordersCache.length;
