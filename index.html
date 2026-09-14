@@ -483,6 +483,40 @@ button {
   gap: 14px;
 }
 
+.form-row select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 15px;
+  background: var(--white);
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.checkbox-row label {
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.empty-catalog {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--ink-soft);
+  grid-column: 1 / -1;
+}
+
 .order-summary {
   background: var(--paper-dim);
   padding: 20px;
@@ -776,32 +810,7 @@ table.orders-table {
   <div class="order-summary" id="checkoutSummary"></div>
 
   <form id="checkoutForm">
-    <div class="form-grid-2">
-      <div class="form-row">
-        <label for="custFirst">First name</label>
-        <input id="custFirst" required>
-      </div>
-      <div class="form-row">
-        <label for="custLast">Last name</label>
-        <input id="custLast" required>
-      </div>
-    </div>
-    <div class="form-row">
-      <label for="custEmail">Email</label>
-      <input id="custEmail" type="email" required>
-    </div>
-    <div class="form-row">
-      <label for="custPhone">Phone</label>
-      <input id="custPhone" type="tel">
-    </div>
-    <div class="form-row">
-      <label for="custAddress">Shipping address</label>
-      <textarea id="custAddress" rows="3" required></textarea>
-    </div>
-    <div class="form-row">
-      <label for="custNote">Order notes (optional)</label>
-      <textarea id="custNote" rows="2"></textarea>
-    </div>
+    <div id="checkoutFields"></div>
     <button class="primary-btn" type="submit" id="placeOrderBtn">Place order</button>
   </form>
 </main>
@@ -863,76 +872,33 @@ const firebaseConfig = {
 /* ============================================================
    PRODUCT CATALOG
    ------------------------------------------------------------
-   This is the only file you need to touch to change what's for
-   sale. Each product needs:
-     id        - a short unique code (letters/numbers, no spaces)
-     name      - product name shown to customers
-     price     - number, in dollars (no $ sign, e.g. 48)
-     image     - a URL to a photo (or leave the placeholder)
-     sizes     - list of sizes customers can choose from
-     tag       - short label shown on the card (or "" for none)
-     description - one line shown on the product detail
-   To add a product, copy one block below, paste it before the
-   closing "];", and edit the values.
-   To remove a product, delete its whole { ... } block.
+   Products are no longer edited in this file. Open admin.html,
+   log in, and use the "Products" tab to add, edit, delete, and
+   reorder items and swap their photos. This file just holds the
+   products loaded live from your database.
    ============================================================ */
 
-const PRODUCTS = [
-  {
-    id: "FW-001",
-    name: "Waxed Field Jacket",
-    price: 168,
-    image: "https://picsum.photos/seed/fernweh1/600/750",
-    sizes: ["S", "M", "L", "XL"],
-    tag: "Best seller",
-    description: "Waxed cotton canvas, corduroy collar, built for weather."
+let PRODUCTS = [];
+
+/* ============================================================
+   CHECKOUT FIELDS — default configuration
+   ------------------------------------------------------------
+   This is only the fallback used before you've saved anything
+   in admin.html's "Checkout fields" tab. Once you save settings
+   there, this file reads your live configuration instead.
+   ============================================================ */
+
+const DEFAULT_CHECKOUT_CONFIG = {
+  standardFields: {
+    firstName: { enabled: true, required: true, label: "First name" },
+    lastName:  { enabled: true, required: true, label: "Last name" },
+    email:     { enabled: true, required: true, label: "Email" },
+    phone:     { enabled: true, required: false, label: "Phone" },
+    address:   { enabled: true, required: true, label: "Shipping address" },
+    note:      { enabled: true, required: false, label: "Order notes (optional)" }
   },
-  {
-    id: "FW-002",
-    name: "Heavyweight Ribbed Tee",
-    price: 42,
-    image: "https://picsum.photos/seed/fernweh2/600/750",
-    sizes: ["XS", "S", "M", "L", "XL"],
-    tag: "",
-    description: "13oz cotton jersey, garment-dyed, boxy fit."
-  },
-  {
-    id: "FW-003",
-    name: "Trail Wool Overshirt",
-    price: 129,
-    image: "https://picsum.photos/seed/fernweh3/600/750",
-    sizes: ["S", "M", "L", "XL"],
-    tag: "New",
-    description: "Brushed wool blend, snap placket, two chest pockets."
-  },
-  {
-    id: "FW-004",
-    name: "Canvas Utility Pant",
-    price: 98,
-    image: "https://picsum.photos/seed/fernweh4/600/750",
-    sizes: ["28", "30", "32", "34", "36"],
-    tag: "",
-    description: "Reinforced knees, articulated fit, straight leg."
-  },
-  {
-    id: "FW-005",
-    name: "Alpine Wool Beanie",
-    price: 34,
-    image: "https://picsum.photos/seed/fernweh5/600/750",
-    sizes: ["One size"],
-    tag: "",
-    description: "Merino wool rib knit, folded cuff."
-  },
-  {
-    id: "FW-006",
-    name: "Selvedge Denim Jacket",
-    price: 154,
-    image: "https://picsum.photos/seed/fernweh6/600/750",
-    sizes: ["S", "M", "L", "XL"],
-    tag: "Best seller",
-    description: "14oz raw selvedge, unwashed, will fade with wear."
-  }
-];
+  customFields: []
+};
 
 </script>
 <script>
@@ -954,6 +920,39 @@ try {
   }
 } catch (e) {
   console.warn("Firebase not initialized yet:", e);
+}
+
+// ---------- Live product catalog ----------
+function loadProducts() {
+  if (!firebaseReady) {
+    renderGrid();
+    return;
+  }
+  db.collection("products").orderBy("position", "asc").onSnapshot((snapshot) => {
+    PRODUCTS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderGrid();
+  }, (err) => {
+    console.error("Couldn't load products:", err);
+    renderGrid();
+  });
+}
+
+// ---------- Checkout field configuration ----------
+let CHECKOUT_CONFIG = DEFAULT_CHECKOUT_CONFIG;
+
+function loadCheckoutConfig() {
+  if (!firebaseReady) return Promise.resolve();
+  return db.collection("settings").doc("checkout").get().then(docSnap => {
+    if (docSnap.exists) {
+      const data = docSnap.data();
+      CHECKOUT_CONFIG = {
+        standardFields: Object.assign({}, DEFAULT_CHECKOUT_CONFIG.standardFields, data.standardFields || {}),
+        customFields: data.customFields || []
+      };
+    }
+  }).catch(err => {
+    console.warn("Couldn't load checkout field settings, using defaults:", err);
+  });
 }
 
 // ---------- Cart state (persisted in this browser) ----------
@@ -1019,6 +1018,11 @@ function money(n) {
 const productGrid = document.getElementById("productGrid");
 
 function renderGrid() {
+  if (PRODUCTS.length === 0) {
+    productGrid.innerHTML = `<div class="empty-catalog">Nothing's for sale here yet — add products from the admin dashboard.</div>`;
+    return;
+  }
+
   productGrid.innerHTML = PRODUCTS.map(p => `
     <div class="card">
       <div class="thumb">
@@ -1175,9 +1179,11 @@ const checkoutSummary = document.getElementById("checkoutSummary");
 const checkoutForm = document.getElementById("checkoutForm");
 const placeOrderBtn = document.getElementById("placeOrderBtn");
 
-document.getElementById("checkoutBtn").addEventListener("click", () => {
+document.getElementById("checkoutBtn").addEventListener("click", async () => {
   if (cart.length === 0) return;
   closeDrawer();
+  await loadCheckoutConfig();
+  renderCheckoutFields();
   heroSection.style.display = "none";
   catalogMain.style.display = "none";
   checkoutView.style.display = "block";
@@ -1191,22 +1197,79 @@ function renderCheckoutSummary() {
   `).join("") + `<div class="row total-row"><span>Total</span><span>${money(cartSubtotal())}</span></div>`;
 }
 
+// ---------- Dynamic checkout fields ----------
+const checkoutFieldsEl = document.getElementById("checkoutFields");
+
+function fieldRowHtml(key, field, inputHtml) {
+  return `<div class="form-row"><label for="field_${key}">${field.label}${field.required ? "" : " (optional)"}</label>${inputHtml}</div>`;
+}
+
+function renderCheckoutFields() {
+  const sf = CHECKOUT_CONFIG.standardFields;
+  let html = "";
+
+  // First + last name share a row when both are on, like the original layout.
+  if (sf.firstName.enabled && sf.lastName.enabled) {
+    html += `<div class="form-grid-2">
+      <div class="form-row"><label for="field_firstName">${sf.firstName.label}</label><input id="field_firstName" ${sf.firstName.required ? "required" : ""}></div>
+      <div class="form-row"><label for="field_lastName">${sf.lastName.label}</label><input id="field_lastName" ${sf.lastName.required ? "required" : ""}></div>
+    </div>`;
+  } else {
+    if (sf.firstName.enabled) html += fieldRowHtml("firstName", sf.firstName, `<input id="field_firstName" ${sf.firstName.required ? "required" : ""}>`);
+    if (sf.lastName.enabled) html += fieldRowHtml("lastName", sf.lastName, `<input id="field_lastName" ${sf.lastName.required ? "required" : ""}>`);
+  }
+
+  if (sf.email.enabled) html += fieldRowHtml("email", sf.email, `<input id="field_email" type="email" ${sf.email.required ? "required" : ""}>`);
+  if (sf.phone.enabled) html += fieldRowHtml("phone", sf.phone, `<input id="field_phone" type="tel" ${sf.phone.required ? "required" : ""}>`);
+  if (sf.address.enabled) html += fieldRowHtml("address", sf.address, `<textarea id="field_address" rows="3" ${sf.address.required ? "required" : ""}></textarea>`);
+  if (sf.note.enabled) html += fieldRowHtml("note", sf.note, `<textarea id="field_note" rows="2"></textarea>`);
+
+  (CHECKOUT_CONFIG.customFields || []).forEach(cf => {
+    const domId = "field_custom_" + cf.id;
+    const reqAttr = cf.required ? "required" : "";
+    if (cf.type === "textarea") {
+      html += fieldRowHtml("custom_" + cf.id, cf, `<textarea id="${domId}" rows="2" ${reqAttr}></textarea>`);
+    } else if (cf.type === "select") {
+      const opts = (cf.options || "").split(",").map(o => o.trim()).filter(Boolean);
+      html += fieldRowHtml("custom_" + cf.id, cf, `<select id="${domId}" ${reqAttr}><option value="">Choose...</option>${opts.map(o => `<option value="${o}">${o}</option>`).join("")}</select>`);
+    } else if (cf.type === "checkbox") {
+      html += `<div class="checkbox-row"><input type="checkbox" id="${domId}"><label for="${domId}">${cf.label}</label></div>`;
+    } else {
+      html += fieldRowHtml("custom_" + cf.id, cf, `<input id="${domId}" ${reqAttr}>`);
+    }
+  });
+
+  checkoutFieldsEl.innerHTML = html;
+}
+
+function collectOrderFields() {
+  const sf = CHECKOUT_CONFIG.standardFields;
+  const order = {};
+  ["firstName", "lastName", "email", "phone", "address", "note"].forEach(key => {
+    if (sf[key].enabled) {
+      const el = document.getElementById("field_" + key);
+      order[key] = el ? el.value.trim() : "";
+    }
+  });
+  order.customFields = (CHECKOUT_CONFIG.customFields || []).map(cf => {
+    const el = document.getElementById("field_custom_" + cf.id);
+    let value = "";
+    if (el) value = cf.type === "checkbox" ? (el.checked ? "Yes" : "No") : el.value.trim();
+    return { label: cf.label, value };
+  });
+  return order;
+}
+
 checkoutForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const order = {
-    firstName: document.getElementById("custFirst").value.trim(),
-    lastName: document.getElementById("custLast").value.trim(),
-    email: document.getElementById("custEmail").value.trim(),
-    phone: document.getElementById("custPhone").value.trim(),
-    address: document.getElementById("custAddress").value.trim(),
-    note: document.getElementById("custNote").value.trim(),
+  const order = Object.assign(collectOrderFields(), {
     items: cart.map(l => ({ name: l.name, size: l.size, qty: l.qty, price: l.price })),
     itemCount: cartItemCount(),
     total: cartSubtotal(),
     status: "New",
     createdAt: firebaseReady ? firebase.firestore.FieldValue.serverTimestamp() : new Date().toISOString()
-  };
+  });
 
   if (!firebaseReady) {
     alert("Firebase isn't set up yet, so this demo order can't be saved. See the FIREBASE CONFIG setup steps near the top of this file's code — once that's done, orders will save for real.");
@@ -1233,7 +1296,8 @@ checkoutForm.addEventListener("submit", async (e) => {
 });
 
 // ---------- Init ----------
-renderGrid();
+loadProducts();
+loadCheckoutConfig();
 renderCartCount();
 renderDrawer();
 

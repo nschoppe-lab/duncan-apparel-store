@@ -699,6 +699,204 @@ table.orders-table {
 
 .loading-msg { padding: 40px 0; color: var(--ink-soft); font-size: 14px; }
 
+/* ---------- admin: products ---------- */
+
+.product-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.product-admin-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-admin-card .thumb {
+  aspect-ratio: 4 / 5;
+  background: var(--paper-dim);
+  overflow: hidden;
+}
+
+.product-admin-card .thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.product-admin-card .pbody {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.product-admin-card h4 { font-size: 16px; }
+.product-admin-card .p-price { font-weight: 600; color: var(--rust-dark); }
+.product-admin-card .p-tag { font-size: 12px; color: var(--moss); font-weight: 600; }
+.product-admin-card .p-sizes { font-size: 12px; color: var(--ink-soft); }
+
+.product-admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.icon-btn {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.icon-btn:hover { background: var(--paper-dim); }
+
+.icon-btn.danger { color: var(--rust-dark); border-color: var(--rust); }
+.icon-btn.danger:hover { background: var(--rust); color: var(--white); }
+
+.product-admin-actions .spacer { flex: 1; }
+
+.image-upload-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.image-preview {
+  width: 64px;
+  height: 80px;
+  object-fit: cover;
+  background: var(--paper-dim);
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.upload-status { font-size: 13px; color: var(--ink-soft); }
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.modal-actions .secondary-btn {
+  flex: 1;
+  background: none;
+  border: 1px solid var(--ink);
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: var(--radius);
+  color: var(--ink);
+}
+
+.modal-actions .primary-btn { flex: 2; }
+
+/* ---------- admin: checkout field editor ---------- */
+
+.field-editor-section {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 20px;
+}
+
+.field-editor-section h3 { font-size: 16px; margin-bottom: 4px; }
+.field-editor-section .hint { font-size: 13px; color: var(--ink-soft); margin-bottom: 16px; }
+
+.standard-field-row {
+  display: grid;
+  grid-template-columns: 90px 90px 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.standard-field-row:last-child { border-bottom: none; }
+
+.standard-field-row .toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.standard-field-row input[type="text"] {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 14px;
+  width: 100%;
+}
+
+.custom-field-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 90px 1.2fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.custom-field-row:last-child { border-bottom: none; }
+
+.custom-field-row input[type="text"], .custom-field-row select {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 14px;
+  width: 100%;
+}
+
+.custom-field-row .toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.field-col-labels {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 90px 1.2fr auto;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--ink);
+  margin-bottom: 4px;
+}
+
+.save-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.save-bar .primary-btn { width: auto; padding: 12px 28px; }
+.save-status { font-size: 13px; color: var(--moss); }
+
 @media (max-width: 640px) {
   .site-header, .catalog, .hero, .admin-header, .admin-shell { padding-left: 20px; padding-right: 20px; }
   .form-grid-2 { grid-template-columns: 1fr; }
@@ -737,6 +935,8 @@ table.orders-table {
   <div class="admin-shell">
     <div class="tabs">
       <button class="tab-btn active" data-tab="orders">Orders</button>
+      <button class="tab-btn" data-tab="products">Products</button>
+      <button class="tab-btn" data-tab="checkout">Checkout fields</button>
       <button class="tab-btn" data-tab="summary">Summary</button>
     </div>
 
@@ -749,6 +949,42 @@ table.orders-table {
       <div id="ordersTableWrap"></div>
     </div>
 
+    <!-- Products tab -->
+    <div class="tab-panel" id="tab-products">
+      <div class="toolbar">
+        <span class="count" id="productCount">Loading products...</span>
+        <div style="display:flex; gap:10px;">
+          <button class="icon-btn" id="seedStarterBtn" style="display:none;">Add 6 starter products</button>
+          <button class="download-btn" id="addProductBtn">Add product</button>
+        </div>
+      </div>
+      <div id="productsGridWrap"></div>
+    </div>
+
+    <!-- Checkout fields tab -->
+    <div class="tab-panel" id="tab-checkout">
+      <div class="field-editor-section">
+        <h3>Standard fields</h3>
+        <p class="hint">Turn any of these off if you don't need them, mark them required, or relabel them.</p>
+        <div id="standardFieldsWrap"></div>
+      </div>
+
+      <div class="field-editor-section">
+        <h3>Custom fields</h3>
+        <p class="hint">Add your own questions — a gift message, a delivery date, a T-shirt size, anything.</p>
+        <div class="field-col-labels">
+          <span>Label</span><span>Type</span><span>Required</span><span>Options (for dropdown)</span><span></span>
+        </div>
+        <div id="customFieldsWrap"></div>
+        <button class="icon-btn" id="addCustomFieldBtn" style="margin-top:10px;">+ Add custom field</button>
+      </div>
+
+      <div class="save-bar">
+        <button class="download-btn" id="saveCheckoutConfigBtn">Save changes</button>
+        <span class="save-status" id="checkoutSaveStatus"></span>
+      </div>
+    </div>
+
     <!-- Summary tab -->
     <div class="tab-panel" id="tab-summary">
       <div class="stat-cards" id="statCards"></div>
@@ -756,9 +992,57 @@ table.orders-table {
   </div>
 </div>
 
+<!-- Product add/edit modal -->
+<div class="overlay" id="productOverlay">
+  <div class="modal">
+    <button class="modal-close" id="productModalClose">&times;</button>
+    <h3 id="productModalTitle" style="margin-bottom:20px;">Add product</h3>
+    <div class="form-row">
+      <label for="pfName">Name</label>
+      <input id="pfName" required>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-row">
+        <label for="pfPrice">Price (USD)</label>
+        <input id="pfPrice" type="number" step="0.01" min="0" required>
+      </div>
+      <div class="form-row">
+        <label for="pfTag">Tag (optional)</label>
+        <input id="pfTag" placeholder="e.g. New, Best seller">
+      </div>
+    </div>
+    <div class="form-row">
+      <label for="pfSizes">Sizes (comma-separated)</label>
+      <input id="pfSizes" placeholder="S, M, L, XL">
+    </div>
+    <div class="form-row">
+      <label for="pfDescription">Description</label>
+      <textarea id="pfDescription" rows="2"></textarea>
+    </div>
+    <div class="form-row">
+      <label>Photo</label>
+      <div class="image-upload-row">
+        <img class="image-preview" id="pfImagePreview" src="" alt="">
+        <div style="flex:1;">
+          <input id="pfImageUrl" placeholder="Image URL, or upload a file below">
+          <div style="margin-top:8px;">
+            <input type="file" id="pfImageFile" accept="image/*">
+          </div>
+          <div class="upload-status" id="pfUploadStatus"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="secondary-btn" type="button" id="productModalCancel">Cancel</button>
+      <button class="primary-btn" type="button" id="productModalSave">Save product</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 <script>
 /* ============================================================
    FIREBASE CONFIG
@@ -808,8 +1092,31 @@ const firebaseConfig = {
    You shouldn't need to edit this file.
    ============================================================ */
 
-let auth, db;
+let auth, db, storage;
 let ordersCache = [];
+
+// Used only by the "Add 6 starter products" button, so a brand-new store
+// isn't empty on day one. Edit or delete these freely once they're in.
+const DEFAULT_PRODUCTS = [
+  { name: "Waxed Field Jacket", price: 168, image: "https://picsum.photos/seed/fernweh1/600/750", sizes: ["S", "M", "L", "XL"], tag: "Best seller", description: "Waxed cotton canvas, corduroy collar, built for weather." },
+  { name: "Heavyweight Ribbed Tee", price: 42, image: "https://picsum.photos/seed/fernweh2/600/750", sizes: ["XS", "S", "M", "L", "XL"], tag: "", description: "13oz cotton jersey, garment-dyed, boxy fit." },
+  { name: "Trail Wool Overshirt", price: 129, image: "https://picsum.photos/seed/fernweh3/600/750", sizes: ["S", "M", "L", "XL"], tag: "New", description: "Brushed wool blend, snap placket, two chest pockets." },
+  { name: "Canvas Utility Pant", price: 98, image: "https://picsum.photos/seed/fernweh4/600/750", sizes: ["28", "30", "32", "34", "36"], tag: "", description: "Reinforced knees, articulated fit, straight leg." },
+  { name: "Alpine Wool Beanie", price: 34, image: "https://picsum.photos/seed/fernweh5/600/750", sizes: ["One size"], tag: "", description: "Merino wool rib knit, folded cuff." },
+  { name: "Selvedge Denim Jacket", price: 154, image: "https://picsum.photos/seed/fernweh6/600/750", sizes: ["S", "M", "L", "XL"], tag: "Best seller", description: "14oz raw selvedge, unwashed, will fade with wear." }
+];
+
+const DEFAULT_CHECKOUT_CONFIG = {
+  standardFields: {
+    firstName: { enabled: true, required: true, label: "First name" },
+    lastName:  { enabled: true, required: true, label: "Last name" },
+    email:     { enabled: true, required: true, label: "Email" },
+    phone:     { enabled: true, required: false, label: "Phone" },
+    address:   { enabled: true, required: true, label: "Shipping address" },
+    note:      { enabled: true, required: false, label: "Order notes (optional)" }
+  },
+  customFields: []
+};
 
 if (!firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("PASTE_")) {
   document.getElementById("loginShell").innerHTML =
@@ -818,6 +1125,7 @@ if (!firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("PASTE_")) {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
   db = firebase.firestore();
+  try { storage = firebase.storage(); } catch (e) { console.warn("Firebase Storage not available:", e); }
 
   const loginShell = document.getElementById("loginShell");
   const dashboard = document.getElementById("dashboard");
@@ -844,6 +1152,8 @@ if (!firebaseConfig.apiKey || firebaseConfig.apiKey.startsWith("PASTE_")) {
       loginShell.style.display = "none";
       dashboard.style.display = "block";
       loadOrders();
+      loadProducts();
+      loadCheckoutConfig();
     } else {
       loginShell.style.display = "block";
       dashboard.style.display = "none";
@@ -902,10 +1212,16 @@ function renderOrdersTable() {
       `<div class="item-line"><span>${i.name} &middot; size ${i.size} &middot; qty ${i.qty}</span><span>${money(i.price * i.qty)}</span></div>`
     ).join("");
 
+    const customName = `${o.firstName || ""} ${o.lastName || ""}`.trim();
+    const displayName = customName || o.email || "Guest";
+    const customFieldsDetail = (o.customFields || []).filter(cf => cf.value).map(cf =>
+      `<div style="margin-top:6px;"><strong>${cf.label}</strong> ${cf.value}</div>`
+    ).join("");
+
     return `
       <tr class="order-row" data-id="${o.id}">
         <td>${formatDate(o.createdAt)}</td>
-        <td>${o.firstName || ""} ${o.lastName || ""}<br><span style="color:var(--ink-soft); font-size:13px;">${o.email || ""}</span></td>
+        <td>${displayName}${o.email && customName ? `<br><span style="color:var(--ink-soft); font-size:13px;">${o.email}</span>` : ""}</td>
         <td>${itemsSummary}</td>
         <td>${o.itemCount || 0}</td>
         <td>${money(o.total)}</td>
@@ -913,9 +1229,10 @@ function renderOrdersTable() {
       </tr>
       <tr class="items-detail-row" id="detail-${o.id}">
         <td colspan="6">
-          <strong>Shipping address</strong><div>${(o.address || "").replace(/\n/g, "<br>")}</div>
+          ${o.address ? `<strong>Shipping address</strong><div>${o.address.replace(/\n/g, "<br>")}</div>` : ""}
           ${o.phone ? `<div style="margin-top:6px;"><strong>Phone</strong> ${o.phone}</div>` : ""}
           ${o.note ? `<div style="margin-top:6px;"><strong>Notes</strong> ${o.note}</div>` : ""}
+          ${customFieldsDetail}
           <div style="margin-top:12px;"><strong>Items</strong>${itemsDetail}</div>
         </td>
       </tr>
@@ -959,6 +1276,320 @@ function renderSummary() {
   `;
 }
 
+// ========================================================
+// PRODUCTS TAB
+// ========================================================
+let productsCache = [];
+let editingProductId = null;
+
+function loadProducts() {
+  document.getElementById("productsGridWrap").innerHTML = `<div class="loading-msg">Loading products...</div>`;
+  db.collection("products").orderBy("position", "asc").onSnapshot((snapshot) => {
+    productsCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    renderProductsGrid();
+  }, (err) => {
+    document.getElementById("productsGridWrap").innerHTML = `<div class="empty-state">Couldn't load products: ${err.message}</div>`;
+  });
+}
+
+function renderProductsGrid() {
+  const wrap = document.getElementById("productsGridWrap");
+  const countEl = document.getElementById("productCount");
+  const seedBtn = document.getElementById("seedStarterBtn");
+  countEl.textContent = productsCache.length + (productsCache.length === 1 ? " product" : " products");
+  seedBtn.style.display = productsCache.length === 0 ? "inline-block" : "none";
+
+  if (productsCache.length === 0) {
+    wrap.innerHTML = `<div class="empty-state">No products yet. Click "Add product", or "Add 6 starter products" to try the store with sample items.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<div class="product-admin-grid">${productsCache.map((p, idx) => `
+    <div class="product-admin-card">
+      <div class="thumb"><img src="${p.image || ''}" alt="${p.name || ''}"></div>
+      <div class="pbody">
+        <h4>${p.name || "(untitled)"}</h4>
+        <div class="p-price">${money(p.price)}</div>
+        ${p.tag ? `<div class="p-tag">${p.tag}</div>` : ""}
+        <div class="p-sizes">${(p.sizes || []).join(", ")}</div>
+        <div class="product-admin-actions">
+          <button class="icon-btn" data-move="up" data-id="${p.id}" ${idx === 0 ? "disabled" : ""} title="Move up">&uarr;</button>
+          <button class="icon-btn" data-move="down" data-id="${p.id}" ${idx === productsCache.length - 1 ? "disabled" : ""} title="Move down">&darr;</button>
+          <span class="spacer"></span>
+          <button class="icon-btn" data-edit="${p.id}">Edit</button>
+          <button class="icon-btn danger" data-delete="${p.id}">Delete</button>
+        </div>
+      </div>
+    </div>
+  `).join("")}</div>`;
+
+  wrap.querySelectorAll("[data-edit]").forEach(btn => {
+    btn.addEventListener("click", () => openProductModal(btn.dataset.edit));
+  });
+  wrap.querySelectorAll("[data-delete]").forEach(btn => {
+    btn.addEventListener("click", () => deleteProduct(btn.dataset.delete));
+  });
+  wrap.querySelectorAll("[data-move]").forEach(btn => {
+    btn.addEventListener("click", () => moveProduct(btn.dataset.id, btn.dataset.move));
+  });
+}
+
+function moveProduct(id, direction) {
+  const idx = productsCache.findIndex(p => p.id === id);
+  const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+  if (idx < 0 || swapIdx < 0 || swapIdx >= productsCache.length) return;
+
+  const a = productsCache[idx];
+  const b = productsCache[swapIdx];
+  const aPos = a.position || 0;
+  const bPos = b.position || 0;
+
+  const batch = db.batch();
+  batch.update(db.collection("products").doc(a.id), { position: bPos });
+  batch.update(db.collection("products").doc(b.id), { position: aPos });
+  batch.commit().catch(err => alert("Couldn't reorder: " + err.message));
+}
+
+function deleteProduct(id) {
+  const p = productsCache.find(x => x.id === id);
+  if (!confirm(`Delete "${p ? p.name : "this product"}"? This can't be undone.`)) return;
+  db.collection("products").doc(id).delete().catch(err => alert("Couldn't delete: " + err.message));
+}
+
+// ---------- Product add/edit modal ----------
+const productOverlay = document.getElementById("productOverlay");
+const pfName = document.getElementById("pfName");
+const pfPrice = document.getElementById("pfPrice");
+const pfTag = document.getElementById("pfTag");
+const pfSizes = document.getElementById("pfSizes");
+const pfDescription = document.getElementById("pfDescription");
+const pfImageUrl = document.getElementById("pfImageUrl");
+const pfImageFile = document.getElementById("pfImageFile");
+const pfImagePreview = document.getElementById("pfImagePreview");
+const pfUploadStatus = document.getElementById("pfUploadStatus");
+
+function openProductModal(id) {
+  editingProductId = id || null;
+  const p = id ? productsCache.find(x => x.id === id) : null;
+
+  document.getElementById("productModalTitle").textContent = p ? "Edit product" : "Add product";
+  pfName.value = p ? (p.name || "") : "";
+  pfPrice.value = p ? (p.price || "") : "";
+  pfTag.value = p ? (p.tag || "") : "";
+  pfSizes.value = p ? (p.sizes || []).join(", ") : "";
+  pfDescription.value = p ? (p.description || "") : "";
+  pfImageUrl.value = p ? (p.image || "") : "";
+  pfImagePreview.src = p && p.image ? p.image : "";
+  pfImageFile.value = "";
+  pfUploadStatus.textContent = "";
+
+  productOverlay.classList.add("open");
+}
+
+function closeProductModal() {
+  productOverlay.classList.remove("open");
+}
+
+document.getElementById("addProductBtn").addEventListener("click", () => openProductModal(null));
+document.getElementById("productModalClose").addEventListener("click", closeProductModal);
+document.getElementById("productModalCancel").addEventListener("click", closeProductModal);
+productOverlay.addEventListener("click", (e) => { if (e.target === productOverlay) closeProductModal(); });
+
+pfImageUrl.addEventListener("input", () => { pfImagePreview.src = pfImageUrl.value; });
+
+pfImageFile.addEventListener("change", () => {
+  const file = pfImageFile.files[0];
+  if (!file) return;
+  if (!storage) {
+    pfUploadStatus.textContent = "Image upload isn't set up — paste an image URL instead, or see README for enabling Firebase Storage.";
+    return;
+  }
+  pfUploadStatus.textContent = "Uploading...";
+  const path = "product-images/" + Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9._-]/g, "");
+  const ref = storage.ref().child(path);
+  ref.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(url => {
+    pfImageUrl.value = url;
+    pfImagePreview.src = url;
+    pfUploadStatus.textContent = "Uploaded.";
+  }).catch(err => {
+    pfUploadStatus.textContent = "Upload failed: " + err.message;
+  });
+});
+
+document.getElementById("productModalSave").addEventListener("click", () => {
+  const name = pfName.value.trim();
+  const price = parseFloat(pfPrice.value);
+  if (!name) { alert("Give the product a name."); return; }
+  if (isNaN(price) || price < 0) { alert("Enter a valid price."); return; }
+
+  const sizes = pfSizes.value.split(",").map(s => s.trim()).filter(Boolean);
+  const data = {
+    name,
+    price,
+    tag: pfTag.value.trim(),
+    sizes: sizes.length ? sizes : ["One size"],
+    description: pfDescription.value.trim(),
+    image: pfImageUrl.value.trim()
+  };
+
+  const save = editingProductId
+    ? db.collection("products").doc(editingProductId).update(data)
+    : db.collection("products").add(Object.assign({}, data, {
+        position: productsCache.length ? Math.max(...productsCache.map(p => p.position || 0)) + 1 : 0
+      }));
+
+  save.then(closeProductModal).catch(err => alert("Couldn't save: " + err.message));
+});
+
+document.getElementById("seedStarterBtn").addEventListener("click", () => {
+  if (!confirm("Add the 6 sample starter products to your store?")) return;
+  const batch = db.batch();
+  DEFAULT_PRODUCTS.forEach((p, i) => {
+    const ref = db.collection("products").doc();
+    batch.set(ref, Object.assign({}, p, { position: i }));
+  });
+  batch.commit().catch(err => alert("Couldn't add starter products: " + err.message));
+});
+
+// ========================================================
+// CHECKOUT FIELDS TAB
+// ========================================================
+let checkoutConfig = JSON.parse(JSON.stringify(DEFAULT_CHECKOUT_CONFIG));
+
+function loadCheckoutConfig() {
+  db.collection("settings").doc("checkout").get().then(docSnap => {
+    if (docSnap.exists) {
+      const data = docSnap.data();
+      checkoutConfig = {
+        standardFields: Object.assign({}, DEFAULT_CHECKOUT_CONFIG.standardFields, data.standardFields || {}),
+        customFields: data.customFields || []
+      };
+    }
+    renderCheckoutEditor();
+  }).catch(err => {
+    console.warn("Couldn't load checkout config, using defaults:", err);
+    renderCheckoutEditor();
+  });
+}
+
+const STANDARD_FIELD_ORDER = ["firstName", "lastName", "email", "phone", "address", "note"];
+
+function renderCheckoutEditor() {
+  const wrap = document.getElementById("standardFieldsWrap");
+  wrap.innerHTML = STANDARD_FIELD_ORDER.map(key => {
+    const f = checkoutConfig.standardFields[key];
+    return `
+      <div class="standard-field-row">
+        <label class="toggle-label"><input type="checkbox" data-std-enabled="${key}" ${f.enabled ? "checked" : ""}> Show</label>
+        <label class="toggle-label"><input type="checkbox" data-std-required="${key}" ${f.required ? "checked" : ""} ${f.enabled ? "" : "disabled"}> Required</label>
+        <input type="text" data-std-label="${key}" value="${f.label}" ${f.enabled ? "" : "disabled"}>
+      </div>
+    `;
+  }).join("");
+
+  wrap.querySelectorAll("[data-std-enabled]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      const key = cb.dataset.stdEnabled;
+      checkoutConfig.standardFields[key].enabled = cb.checked;
+      renderCheckoutEditor();
+    });
+  });
+  wrap.querySelectorAll("[data-std-required]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      checkoutConfig.standardFields[cb.dataset.stdRequired].required = cb.checked;
+    });
+  });
+  wrap.querySelectorAll("[data-std-label]").forEach(inp => {
+    inp.addEventListener("input", () => {
+      checkoutConfig.standardFields[inp.dataset.stdLabel].label = inp.value;
+    });
+  });
+
+  renderCustomFieldsEditor();
+}
+
+function renderCustomFieldsEditor() {
+  const wrap = document.getElementById("customFieldsWrap");
+  if (checkoutConfig.customFields.length === 0) {
+    wrap.innerHTML = `<div class="hint">No custom fields yet.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = checkoutConfig.customFields.map(cf => `
+    <div class="custom-field-row" data-row="${cf.id}">
+      <input type="text" data-cf-label="${cf.id}" value="${cf.label}" placeholder="e.g. Gift message">
+      <select data-cf-type="${cf.id}">
+        <option value="text" ${cf.type === "text" ? "selected" : ""}>Short text</option>
+        <option value="textarea" ${cf.type === "textarea" ? "selected" : ""}>Long text</option>
+        <option value="select" ${cf.type === "select" ? "selected" : ""}>Dropdown</option>
+        <option value="checkbox" ${cf.type === "checkbox" ? "selected" : ""}>Checkbox</option>
+      </select>
+      <label class="toggle-label"><input type="checkbox" data-cf-required="${cf.id}" ${cf.required ? "checked" : ""}> Req.</label>
+      <input type="text" data-cf-options="${cf.id}" value="${cf.options || ""}" placeholder="Option A, Option B" ${cf.type === "select" ? "" : "disabled"}>
+      <button class="icon-btn danger" data-cf-remove="${cf.id}" type="button">Remove</button>
+    </div>
+  `).join("");
+
+  wrap.querySelectorAll("[data-cf-label]").forEach(inp => {
+    inp.addEventListener("input", () => {
+      findCustomField(inp.dataset.cfLabel).label = inp.value;
+    });
+  });
+  wrap.querySelectorAll("[data-cf-type]").forEach(sel => {
+    sel.addEventListener("change", () => {
+      findCustomField(sel.dataset.cfType).type = sel.value;
+      renderCustomFieldsEditor();
+    });
+  });
+  wrap.querySelectorAll("[data-cf-required]").forEach(cb => {
+    cb.addEventListener("change", () => {
+      findCustomField(cb.dataset.cfRequired).required = cb.checked;
+    });
+  });
+  wrap.querySelectorAll("[data-cf-options]").forEach(inp => {
+    inp.addEventListener("input", () => {
+      findCustomField(inp.dataset.cfOptions).options = inp.value;
+    });
+  });
+  wrap.querySelectorAll("[data-cf-remove]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      checkoutConfig.customFields = checkoutConfig.customFields.filter(cf => cf.id !== btn.dataset.cfRemove);
+      renderCustomFieldsEditor();
+    });
+  });
+}
+
+function findCustomField(id) {
+  return checkoutConfig.customFields.find(cf => cf.id === id);
+}
+
+document.getElementById("addCustomFieldBtn").addEventListener("click", () => {
+  checkoutConfig.customFields.push({
+    id: "cf_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+    label: "",
+    type: "text",
+    required: false,
+    options: ""
+  });
+  renderCustomFieldsEditor();
+});
+
+document.getElementById("saveCheckoutConfigBtn").addEventListener("click", () => {
+  const statusEl = document.getElementById("checkoutSaveStatus");
+  const cleanedCustomFields = checkoutConfig.customFields
+    .map(cf => Object.assign({}, cf, { label: cf.label.trim() || "Untitled field" }));
+
+  db.collection("settings").doc("checkout").set({
+    standardFields: checkoutConfig.standardFields,
+    customFields: cleanedCustomFields
+  }).then(() => {
+    statusEl.textContent = "Saved.";
+    setTimeout(() => { statusEl.textContent = ""; }, 3000);
+  }).catch(err => {
+    statusEl.textContent = "Couldn't save: " + err.message;
+  });
+});
+
 // ---------- CSV export ----------
 function csvEscape(val) {
   const str = String(val === undefined || val === null ? "" : val);
@@ -974,25 +1605,35 @@ document.getElementById("downloadCsvBtn").addEventListener("click", () => {
     return;
   }
 
+  const customLabels = [];
+  ordersCache.forEach(o => (o.customFields || []).forEach(cf => {
+    if (!customLabels.includes(cf.label)) customLabels.push(cf.label);
+  }));
+
   const header = [
     "Order ID", "Date", "First name", "Last name", "Email", "Phone",
-    "Address", "Notes", "Items", "Item count", "Total", "Status"
+    "Address", "Notes", ...customLabels, "Items", "Item count", "Total", "Status"
   ];
 
-  const rows = ordersCache.map(o => [
-    o.id,
-    formatDate(o.createdAt),
-    o.firstName,
-    o.lastName,
-    o.email,
-    o.phone,
-    o.address,
-    o.note,
-    (o.items || []).map(i => `${i.name} (${i.size}) x${i.qty}`).join("; "),
-    o.itemCount,
-    o.total,
-    o.status
-  ]);
+  const rows = ordersCache.map(o => {
+    const customMap = {};
+    (o.customFields || []).forEach(cf => { customMap[cf.label] = cf.value; });
+    return [
+      o.id,
+      formatDate(o.createdAt),
+      o.firstName,
+      o.lastName,
+      o.email,
+      o.phone,
+      o.address,
+      o.note,
+      ...customLabels.map(l => customMap[l] !== undefined ? customMap[l] : ""),
+      (o.items || []).map(i => `${i.name} (${i.size}) x${i.qty}`).join("; "),
+      o.itemCount,
+      o.total,
+      o.status
+    ];
+  });
 
   const csv = [header, ...rows].map(r => r.map(csvEscape).join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });

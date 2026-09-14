@@ -9,5 +9,21 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if request.auth != null;
     }
+
+    // Products: anyone can read the catalog (so the storefront can
+    // show it to shoppers who aren't logged in), but only a signed-in
+    // admin can add, edit, or delete products.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Settings (e.g. which checkout fields to collect): anyone can
+    // read so the storefront can build the checkout form, but only a
+    // signed-in admin can change the configuration.
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
   }
 }
