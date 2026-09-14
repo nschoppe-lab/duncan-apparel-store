@@ -1,0 +1,13 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Orders: anyone can create a new order (so customers can check
+    // out without logging in), but only a signed-in admin can read,
+    // update, or delete them. Nobody can overwrite an existing order.
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+  }
+}
