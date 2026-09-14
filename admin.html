@@ -1055,15 +1055,19 @@ table.orders-table {
       <textarea id="pfDescription" rows="2"></textarea>
     </div>
     <div class="form-row">
-      <label>Photo</label>
+      <label for="pfImageUrl">Photo URL</label>
       <div class="image-upload-row">
         <img class="image-preview" id="pfImagePreview" src="" alt="">
         <div style="flex:1;">
-          <input id="pfImageUrl" placeholder="Image URL, or upload a file below">
-          <div style="margin-top:8px;">
-            <input type="file" id="pfImageFile" accept="image/*">
-          </div>
-          <div class="upload-status" id="pfUploadStatus"></div>
+          <input id="pfImageUrl" placeholder="https://example.com/your-photo.jpg">
+          <div class="upload-status" style="margin-top:6px;">Paste a link to any image online. Free places to host one: a GitHub repo (use the "raw" link) or a free image host like imgur.com.</div>
+          <details style="margin-top:10px;">
+            <summary style="cursor:pointer; font-size:13px; color:var(--ink-soft);">Have Firebase Storage (Blaze plan) set up? Upload a file instead</summary>
+            <div style="margin-top:8px;">
+              <input type="file" id="pfImageFile" accept="image/*">
+              <div class="upload-status" id="pfUploadStatus"></div>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -1449,12 +1453,19 @@ pfImageFile.addEventListener("change", () => {
   pfUploadStatus.textContent = "Uploading...";
   const path = "product-images/" + Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9._-]/g, "");
   const ref = storage.ref().child(path);
-  ref.put(file).then(snapshot => snapshot.ref.getDownloadURL()).then(url => {
+
+  const uploadTask = ref.put(file);
+  const timeout = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error("Timed out after 20s. This usually means Firebase Storage hasn't been enabled for this project yet, or its security rules haven't been published — see the README's optional Storage setup step.")), 20000);
+  });
+
+  Promise.race([uploadTask, timeout]).then(snapshot => snapshot.ref.getDownloadURL()).then(url => {
     pfImageUrl.value = url;
     pfImagePreview.src = url;
     pfUploadStatus.textContent = "Uploaded.";
   }).catch(err => {
-    pfUploadStatus.textContent = "Upload failed: " + err.message;
+    console.error("Image upload failed:", err);
+    pfUploadStatus.textContent = "Upload failed" + (err.code ? " (" + err.code + ")" : "") + ": " + err.message;
   }).finally(() => {
     uploadInProgress = false;
     productModalSave.disabled = false;
